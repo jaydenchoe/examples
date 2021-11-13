@@ -20,7 +20,152 @@ import cv2
 from object_detector import ObjectDetector
 from object_detector import ObjectDetectorOptions
 import utils
+## jayden.choe 
+# import request and json modules
+import requests, json
+import math, random ## for random id generation
+################################
 
+## jayden.choe
+# onem2m ae create request
+def onem2m_request_ae_luminosity_create():
+    data_luminosity = {
+        'm2m:ae': {
+        'rn': 'luminosity_0',
+        'api': 'app.company.com',
+        'rr': 'false',
+        'poa': ['']
+      }
+    }
+
+    cse_URL = "http://192.168.86.192:8080/~/server/server"
+    headers_luminosity = {
+      'X-M2M-Origin': 'Cae-luminosity_0',
+      'X-M2M-RI': str(get_random_request_id()),
+      'Content-Type': 'application/json;ty=2' #resource type 2
+    }
+    res = requests.post( cse_URL, json=data_luminosity, headers=headers_luminosity)
+    res.status_code
+    res.text
+
+def onem2m_request_ae_lamp_create():
+    data_lamp = {
+        'm2m:ae': {
+        'rn': 'lamp_0',
+        'api': 'app.company.com',
+        'rr': 'true',
+        'poa': ["http://192.168.86.235:4000/lamp0"]
+      }
+    }
+
+    cse_URL = "http://192.168.86.192:8080/~/server/server"
+    headers_lamp = {
+      'X-M2M-Origin': 'Cae-lamp_0',
+      'X-M2M-RI': str(get_random_request_id()),
+      'Content-Type': 'application/json;ty=2' #resource type 2
+    }
+    res = requests.post( cse_URL, json=data_lamp, headers=headers_lamp)
+    res.status_code
+    res.text   
+
+def onem2m_request_create_luminosity_data_container():
+    data_luminosity = {
+      'm2m:cnt': { 'rn': 'data', 'mni': '100' } 
+    }
+    
+    
+    cse_URL = "http://192.168.86.192:8080/~/server/server/luminosity_0"
+    headers_luminosity = {
+      'X-M2M-Origin': 'Cae-luminosity_0',
+      'X-M2M-RI': str(get_random_request_id()),
+      'Content-Type': 'application/json;ty=3' #resource type 3
+    }
+    res = requests.post( cse_URL, json=data_luminosity, headers=headers_luminosity)
+    res.status_code
+    res.text
+
+def onem2m_request_create_lamp_data_container():
+
+    data_lamp = {
+      'm2m:cnt': {
+         'rn': 'data', 'mni': '100' 
+      } 
+    }
+
+    cse_URL = "http://192.168.86.192:8080/~/server/server/lamp_0"
+    headers_lamp = {
+      'X-M2M-Origin': 'Cae-lamp_0',
+      'X-M2M-RI': str(get_random_request_id()),
+      'Content-Type': 'application/json;ty=3' #resource type 3
+    }
+    res = requests.post( cse_URL, json=data_lamp, headers=headers_lamp)
+    res.status_code
+    res.text   
+
+## to generate random request id for each request
+def get_random_request_id ():
+    random_id = math.floor( random.random() * 10000 )
+    return random_id
+
+## send the recycling product type to oneM2M CSE
+def onem2m_request_create_luminosity_content_instance( recycling_type ):
+    data_luminosity = {
+      'm2m:cin': { 'con': recycling_type } 
+    }
+        
+    cse_URL = "http://192.168.86.192:8080/~/server/server/luminosity_0/data"
+    headers_luminosity = {
+      'X-M2M-Origin': 'Cae-luminosity_0',
+      'X-M2M-RI': str(get_random_request_id()),
+      'Content-Type': 'application/json;ty=4' #resource type 4
+    }
+    res = requests.post( cse_URL, json=data_luminosity, headers=headers_luminosity)
+    res.status_code
+    res.text
+
+def onem2m_request_create_lamp_content_instance():
+    data_lamp = {
+      'm2m:cin': { 'con': '0' } 
+    }
+        
+    cse_URL = "http://192.168.86.192:8080/~/server/server/lamp_0/data"
+    headers_lamp = {
+      'X-M2M-Origin': 'Cae-lamp_0',
+      'X-M2M-RI': str(get_random_request_id()),
+      'Content-Type': 'application/json;ty=4' #resource type 4
+    }
+    res = requests.post( cse_URL, json=data_lamp, headers=headers_lamp)
+    res.status_code
+    res.text
+
+def onem2m_request_create_lamp_subscription():
+    data_lamp = {
+      'm2m:sub': { 
+         'rn': 'sub', 
+         'nu': ["/server/Cae-lamp_0"], 
+         'nct': '2', 
+         'enc': {
+           'net': '3'
+         } 
+      }
+    }
+        
+    cse_URL = "http://192.168.86.192:8080/~/server/server/lamp_0/data"
+    headers_lamp = {
+      'X-M2M-Origin': 'Cae-lamp_0',
+      'X-M2M-RI': str(get_random_request_id()),
+      'Content-Type': 'application/json;ty=23' #resource type 23
+    }
+    res = requests.post( cse_URL, json=data_lamp, headers=headers_lamp)
+    res.status_code
+    res.text
+
+
+## jayden.choe global detected type store value to avoid too frequent detection
+
+g_detected_type = ""
+
+###################################################### jayden.choe
 
 def run(model: str, camera_id: int, width: int, height: int, num_threads: int,
         enable_edgetpu: bool) -> None:
@@ -72,7 +217,34 @@ def run(model: str, camera_id: int, width: int, height: int, num_threads: int,
     image = cv2.flip(image, 1)
 
     # Run object detection estimation using the model.
+    # Return the filtered rounding boxed and categories
     detections = detector.detect(image)
+
+## jayden.choe output all the possible detected category names
+    global g_detected_type
+
+## just 3 categories of bottle, cup and book this time.
+    for detection in detections:
+      category = detection.categories[0]
+      class_name = category.label
+      print(class_name)
+      if "bottle" in class_name and g_detected_type != "bottle":
+         onem2m_request_create_luminosity_content_instance( "bottle" )
+         print( "bottle sent to CSE" )
+         g_detected_type = "bottle"
+         break
+      elif "cup" in class_name and g_detected_type != "cup":
+         onem2m_request_create_luminosity_content_instance( "cup" )
+         print( "cup sent to CSE" )
+         g_detected_type = "cup"
+         break
+      elif "book" in class_name and g_detected_type != "book":
+         onem2m_request_create_luminosity_content_instance( "book" )
+         print( "book sent to CSE" )
+         g_detected_type = "book"
+         break        
+
+#################################################
 
     # Draw keypoints and edges on input image
     image = utils.visualize(image, detections)
@@ -99,6 +271,18 @@ def run(model: str, camera_id: int, width: int, height: int, num_threads: int,
 
 
 def main():
+## jayden.choe  
+## onem2m ae create request    
+  onem2m_request_ae_luminosity_create()
+  onem2m_request_ae_lamp_create()
+  onem2m_request_create_luminosity_data_container()
+  onem2m_request_create_lamp_data_container()
+##  onem2m_request_create_luminosity_content_instance()
+##  onem2m_request_create_lamp_content_instance()
+##  onem2m_request_create_lamp_subscription()
+
+###########################################
+
   parser = argparse.ArgumentParser(
       formatter_class=argparse.ArgumentDefaultsHelpFormatter)
   parser.add_argument(
