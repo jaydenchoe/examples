@@ -274,9 +274,9 @@ def main():
 ## jayden.choe  
 ## onem2m ae create request    
   onem2m_request_ae_recycling_create()
-  onem2m_request_ae_lamp_create()
+##  onem2m_request_ae_lamp_create()
   onem2m_request_create_recycling_data_container()
-  onem2m_request_create_lamp_data_container()
+##  onem2m_request_create_lamp_data_container()
 ##  onem2m_request_create_recycling_content_instance()
 ##  onem2m_request_create_lamp_content_instance()
 ##  onem2m_request_create_lamp_subscription()
