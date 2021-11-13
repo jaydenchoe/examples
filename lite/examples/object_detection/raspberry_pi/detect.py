@@ -28,10 +28,10 @@ import math, random ## for random id generation
 
 ## jayden.choe
 # onem2m ae create request
-def onem2m_request_ae_luminosity_create():
-    data_luminosity = {
+def onem2m_request_ae_recycling_create():
+    data_recycling = {
         'm2m:ae': {
-        'rn': 'luminosity_0',
+        'rn': 'recycling_0',
         'api': 'app.company.com',
         'rr': 'false',
         'poa': ['']
@@ -39,12 +39,12 @@ def onem2m_request_ae_luminosity_create():
     }
 
     cse_URL = "http://192.168.86.192:8080/~/server/server"
-    headers_luminosity = {
-      'X-M2M-Origin': 'Cae-luminosity_0',
+    headers_recycling = {
+      'X-M2M-Origin': 'Cae-recycling_0',
       'X-M2M-RI': str(get_random_request_id()),
       'Content-Type': 'application/json;ty=2' #resource type 2
     }
-    res = requests.post( cse_URL, json=data_luminosity, headers=headers_luminosity)
+    res = requests.post( cse_URL, json=data_recycling, headers=headers_recycling)
     res.status_code
     res.text
 
@@ -68,19 +68,19 @@ def onem2m_request_ae_lamp_create():
     res.status_code
     res.text   
 
-def onem2m_request_create_luminosity_data_container():
-    data_luminosity = {
+def onem2m_request_create_recycling_data_container():
+    data_recycling = {
       'm2m:cnt': { 'rn': 'data', 'mni': '100' } 
     }
     
     
-    cse_URL = "http://192.168.86.192:8080/~/server/server/luminosity_0"
-    headers_luminosity = {
-      'X-M2M-Origin': 'Cae-luminosity_0',
+    cse_URL = "http://192.168.86.192:8080/~/server/server/recycling_0"
+    headers_recycling = {
+      'X-M2M-Origin': 'Cae-recycling_0',
       'X-M2M-RI': str(get_random_request_id()),
       'Content-Type': 'application/json;ty=3' #resource type 3
     }
-    res = requests.post( cse_URL, json=data_luminosity, headers=headers_luminosity)
+    res = requests.post( cse_URL, json=data_recycling, headers=headers_recycling)
     res.status_code
     res.text
 
@@ -108,18 +108,18 @@ def get_random_request_id ():
     return random_id
 
 ## send the recycling product type to oneM2M CSE
-def onem2m_request_create_luminosity_content_instance( recycling_type ):
-    data_luminosity = {
+def onem2m_request_create_recycling_content_instance( recycling_type ):
+    data_recycling = {
       'm2m:cin': { 'con': recycling_type } 
     }
         
-    cse_URL = "http://192.168.86.192:8080/~/server/server/luminosity_0/data"
-    headers_luminosity = {
-      'X-M2M-Origin': 'Cae-luminosity_0',
+    cse_URL = "http://192.168.86.192:8080/~/server/server/recycling_0/data"
+    headers_recycling = {
+      'X-M2M-Origin': 'Cae-recycling_0',
       'X-M2M-RI': str(get_random_request_id()),
       'Content-Type': 'application/json;ty=4' #resource type 4
     }
-    res = requests.post( cse_URL, json=data_luminosity, headers=headers_luminosity)
+    res = requests.post( cse_URL, json=data_recycling, headers=headers_recycling)
     res.status_code
     res.text
 
@@ -227,19 +227,19 @@ def run(model: str, camera_id: int, width: int, height: int, num_threads: int,
     for detection in detections:
       category = detection.categories[0]
       class_name = category.label
-      print(class_name)
+      
       if "bottle" in class_name and g_detected_type != "bottle":
-         onem2m_request_create_luminosity_content_instance( "bottle" )
+         onem2m_request_create_recycling_content_instance( "bottle" )
          print( "bottle sent to CSE" )
          g_detected_type = "bottle"
          break
       elif "cup" in class_name and g_detected_type != "cup":
-         onem2m_request_create_luminosity_content_instance( "cup" )
+         onem2m_request_create_recycling_content_instance( "cup" )
          print( "cup sent to CSE" )
          g_detected_type = "cup"
          break
       elif "book" in class_name and g_detected_type != "book":
-         onem2m_request_create_luminosity_content_instance( "book" )
+         onem2m_request_create_recycling_content_instance( "book" )
          print( "book sent to CSE" )
          g_detected_type = "book"
          break        
@@ -273,11 +273,11 @@ def run(model: str, camera_id: int, width: int, height: int, num_threads: int,
 def main():
 ## jayden.choe  
 ## onem2m ae create request    
-  onem2m_request_ae_luminosity_create()
+  onem2m_request_ae_recycling_create()
   onem2m_request_ae_lamp_create()
-  onem2m_request_create_luminosity_data_container()
+  onem2m_request_create_recycling_data_container()
   onem2m_request_create_lamp_data_container()
-##  onem2m_request_create_luminosity_content_instance()
+##  onem2m_request_create_recycling_content_instance()
 ##  onem2m_request_create_lamp_content_instance()
 ##  onem2m_request_create_lamp_subscription()
 
