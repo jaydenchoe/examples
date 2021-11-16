@@ -29,7 +29,7 @@ the Pi to see the camera stream.
 First, clone this Git repo onto your Raspberry Pi like this:
 
 ```
-git clone https://github.com/tensorflow/examples --depth 1
+git clone https://github.com/jaydenchoe/examples --depth 1
 ```
 
 Then use our script to install a couple Python packages, and download the
